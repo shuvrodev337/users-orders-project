@@ -29,6 +29,7 @@ const UserSchema = new Schema<IUser>({
   hobbies: { type: [String], required: true },
   address: { type: AddressSchema, required: true },
   orders: { type: [OrderSchema], required: true },
+  isDeleted: { type: Boolean, default: false },
 });
 
 export const User = model<IUser>('User', UserSchema);

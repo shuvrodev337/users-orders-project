@@ -24,4 +24,5 @@ export interface IUser {
   hobbies: string[];
   address: IUserAddress;
   orders: IOrder[];
+  isDeleted?: boolean;
 }

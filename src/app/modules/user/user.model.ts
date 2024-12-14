@@ -1,5 +1,13 @@
 import { Schema, model, connect, Model } from 'mongoose';
-import { IOrder, IUser, IUserAddress, IUserFullName } from './user.interface';
+import {
+  IOrder,
+  IUser,
+  IUserAddress,
+  IUserFullName,
+  UserModelForMethods,
+} from './user.interface';
+import bcrypt from 'bcrypt';
+import config from '../../config';
 
 const FullNameSchema = new Schema<IUserFullName>({
   firstName: { type: String, required: true },
@@ -18,7 +26,7 @@ const OrderSchema = new Schema<IOrder>({
   quantity: { type: Number, required: true },
 });
 
-const UserSchema = new Schema<IUser>({
+const UserSchema = new Schema<IUser, UserModelForMethods>({
   userId: { type: Number, required: true, unique: true },
   username: { type: String, required: true, unique: true },
   password: { type: String, required: true },
@@ -32,4 +40,32 @@ const UserSchema = new Schema<IUser>({
   isDeleted: { type: Boolean, default: false },
 });
 
-export const User = model<IUser>('User', UserSchema);
+UserSchema.pre('save', async function (next) {
+  // eslint-disable-next-line @typescript-eslint/no-this-alias
+  const user = this;
+  user.password = await bcrypt.hash(
+    user.password,
+    Number(config.bcrypt_salt_rounds),
+  );
+  next();
+});
+
+// password field removal globally for any response
+UserSchema.set('toJSON', {
+  transform: function (doc, ret) {
+    delete ret.password; // Remove password field from JSON responses
+    return ret;
+  },
+});
+
+UserSchema.set('toObject', {
+  transform: function (doc, ret) {
+    delete ret.password; // Remove password field from Object responses
+    return ret;
+  },
+});
+UserSchema.statics.doesUserExist = async function (userId: number) {
+  const result = await User.findOne({ userId });
+  return result;
+};
+export const User = model<IUser, UserModelForMethods>('User', UserSchema);

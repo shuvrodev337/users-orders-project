@@ -1,6 +1,9 @@
 import { Request, Response } from 'express';
 import { UserServices } from './user.services';
-import { CreateUserValidationSchema } from './user.validation';
+import {
+  CreateUserValidationSchema,
+  UpdateUserValidationSchema,
+} from './user.validation';
 
 const createUser = async (req: Request, res: Response) => {
   try {
@@ -43,7 +46,7 @@ const getSingleUser = async (req: Request, res: Response) => {
     const result = await UserServices.getSingleUserFromDb(Number(userId));
     res.status(200).json({
       success: true,
-      message: 'Users retrieved successfully',
+      message: 'User retrieved successfully',
       data: result,
     });
   } catch (error: any) {
@@ -57,10 +60,11 @@ const getSingleUser = async (req: Request, res: Response) => {
 const updateUser = async (req: Request, res: Response) => {
   const { userId } = req.params;
   const updateData = req.body;
+  const zodParsedData = UpdateUserValidationSchema.parse(updateData);
   try {
     const result = await UserServices.updateUserToDb(
       Number(userId),
-      updateData,
+      zodParsedData,
     );
     res.status(200).json({
       success: true,

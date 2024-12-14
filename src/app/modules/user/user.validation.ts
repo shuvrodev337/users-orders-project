@@ -39,20 +39,4 @@ export const CreateUserValidationSchema = z.object({
 });
 
 // Update User Validation Schema
-export const UpdateUserValidationSchema = z.object({
-  userId: z.number().min(1, 'User ID must be a positive number').optional(),
-  username: z.string().trim().min(1, 'Username must not be empty').optional(),
-  password: z
-    .string()
-    .trim()
-    .min(6, 'Password must be at least 6 characters long')
-    .optional(),
-  fullName: FullNameValidationSchema.partial(), // Partial allows updating only part of the object
-  age: z.number().min(0, 'Age must be a non-negative number').optional(),
-  email: z.string().trim().email('Invalid email address').optional(),
-  isActive: z.boolean().optional(),
-  hobbies: z.array(z.string().trim()).optional(),
-  address: AddressValidationSchema.partial(), // Partial allows updating only part of the object
-  orders: z.array(OrderValidationSchema).optional(),
-  isDeleted: z.boolean().optional(),
-});
+export const UpdateUserValidationSchema = CreateUserValidationSchema.partial();

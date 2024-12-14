@@ -1,3 +1,5 @@
+import { Model } from 'mongoose';
+
 export interface IUserFullName {
   firstName: string;
   lastName: string;
@@ -55,4 +57,8 @@ export interface IUpdateUser {
   address?: IUpdateUserAddress;
   orders?: IUpdateOrder[];
   isDeleted?: boolean;
+}
+// custom static method
+export interface UserModelForMethods extends Model<IUser> {
+  doesUserExist(userId: number): Promise<IUser | null>;
 }

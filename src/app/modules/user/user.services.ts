@@ -23,7 +23,7 @@ const updateUserToDb = async (userId: number, updateUser: IUpdateUser) => {
 };
 const deleteSingleUserFromDb = async (userId: number) => {
   const result = await User.findOneAndUpdate(
-    { userId: userId },
+    { userId: userId, isDeleted: { $ne: true } },
     { isDeleted: true },
   );
   return result;

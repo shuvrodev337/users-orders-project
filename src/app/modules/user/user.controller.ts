@@ -51,9 +51,31 @@ const getSingleUser = async (req: Request, res: Response) => {
     });
   }
 };
+const updateUser = async (req: Request, res: Response) => {
+  const { userId } = req.params;
+  const updateData = req.body;
+  try {
+    const result = await UserServices.updateUserToDb(
+      Number(userId),
+      updateData,
+    );
+    res.status(200).json({
+      success: true,
+      message: 'Users updated successfully',
+      data: result,
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: error.message || 'An unexpected error occurred',
+      error: error,
+    });
+  }
+};
 
 export const UserController = {
   createUser,
   getUsers,
   getSingleUser,
+  updateUser,
 };

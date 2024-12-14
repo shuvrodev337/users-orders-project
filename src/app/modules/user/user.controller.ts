@@ -136,6 +136,23 @@ const getOrdersOfUser = async (req: Request, res: Response) => {
     });
   }
 };
+const getOrdersTotalPrice = async (req: Request, res: Response) => {
+  try {
+    const { userId } = req.params;
+    const result = await UserServices.getOrdersTotalPriceFromDb(Number(userId));
+    res.status(200).json({
+      success: true,
+      message: 'Order fetched successfully!',
+      data: result,
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: error.message || 'An unexpected error occurred',
+      error: error,
+    });
+  }
+};
 export const UserController = {
   createUser,
   getUsers,
@@ -144,4 +161,5 @@ export const UserController = {
   deleteSingleUser,
   addOrderToUser,
   getOrdersOfUser,
+  getOrdersTotalPrice,
 };

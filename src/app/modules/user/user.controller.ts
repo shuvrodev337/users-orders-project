@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { UserServices } from './user.services';
 import {
   CreateUserValidationSchema,
+  OrderValidationSchema,
   UpdateUserValidationSchema,
 } from './user.validation';
 
@@ -41,8 +42,8 @@ const getUsers = async (req: Request, res: Response) => {
   }
 };
 const getSingleUser = async (req: Request, res: Response) => {
-  const { userId } = req.params;
   try {
+    const { userId } = req.params;
     const result = await UserServices.getSingleUserFromDb(Number(userId));
     res.status(200).json({
       success: true,
@@ -58,10 +59,10 @@ const getSingleUser = async (req: Request, res: Response) => {
   }
 };
 const updateUser = async (req: Request, res: Response) => {
-  const { userId } = req.params;
-  const updateData = req.body;
-  const zodParsedData = UpdateUserValidationSchema.parse(updateData);
   try {
+    const { userId } = req.params;
+    const updateData = req.body;
+    const zodParsedData = UpdateUserValidationSchema.parse(updateData);
     const result = await UserServices.updateUserToDb(
       Number(userId),
       zodParsedData,
@@ -80,12 +81,34 @@ const updateUser = async (req: Request, res: Response) => {
   }
 };
 const deleteSingleUser = async (req: Request, res: Response) => {
-  const { userId } = req.params;
   try {
+    const { userId } = req.params;
     const result = await UserServices.deleteSingleUserFromDb(Number(userId));
     res.status(200).json({
       success: true,
       message: 'Users deleted successfully',
+      data: result,
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: error.message || 'An unexpected error occurred',
+      error: error,
+    });
+  }
+};
+const addOrderToUser = async (req: Request, res: Response) => {
+  try {
+    const { userId } = req.params;
+    const { order } = req.body;
+    const zodParsedOrder = OrderValidationSchema.parse(order);
+    const result = await UserServices.addOrderToUserToDb(
+      Number(userId),
+      zodParsedOrder,
+    );
+    res.status(200).json({
+      success: true,
+      message: 'Order Added successfully',
       data: result,
     });
   } catch (error: any) {
@@ -103,4 +126,5 @@ export const UserController = {
   getSingleUser,
   updateUser,
   deleteSingleUser,
+  addOrderToUser,
 };

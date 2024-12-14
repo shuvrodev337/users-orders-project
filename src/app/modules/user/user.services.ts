@@ -1,4 +1,4 @@
-import { IUpdateUser, IUser } from './user.interface';
+import { IOrder, IUpdateUser, IUser } from './user.interface';
 import { User } from './user.model';
 
 const createUserIntoDb = async (user: IUser) => {
@@ -32,6 +32,7 @@ const updateUserToDb = async (userId: number, updateUser: IUpdateUser) => {
     (error as any).description = 'User not found';
     throw error;
   }
+  //findOneAndUpdate returns updated data, updateOne does not
   const result = await User.findOneAndUpdate(
     { userId: userId, isDeleted: { $ne: true } },
     { $set: updateUser },
@@ -46,6 +47,20 @@ const deleteSingleUserFromDb = async (userId: number) => {
   );
   return result ? null : null;
 };
+const addOrderToUserToDb = async (userId: number, order: IOrder) => {
+  const userExists = await User.doesUserExist(userId);
+  if (!userExists) {
+    const error = new Error('User not found');
+    (error as any).statusCode = 404;
+    (error as any).description = 'User not found';
+    throw error;
+  }
+  const result = await User.findOneAndUpdate(
+    { userId: userId, isDeleted: { $ne: true } },
+    { $push: { orders: order } },
+  );
+  return result ? null : null;
+};
 
 export const UserServices = {
   createUserIntoDb,
@@ -53,4 +68,5 @@ export const UserServices = {
   getSingleUserFromDb,
   deleteSingleUserFromDb,
   updateUserToDb,
+  addOrderToUserToDb,
 };

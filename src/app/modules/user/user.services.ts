@@ -32,7 +32,6 @@ const updateUserToDb = async (userId: number, updateUser: IUpdateUser) => {
     (error as any).description = 'User not found';
     throw error;
   }
-  //findOneAndUpdate returns updated data, updateOne does not
   const result = await User.findOneAndUpdate(
     { userId: userId, isDeleted: { $ne: true } },
     { $set: updateUser },
@@ -61,7 +60,17 @@ const addOrderToUserToDb = async (userId: number, order: IOrder) => {
   );
   return result ? null : null;
 };
-
+const getOrdersOfUserFromDb = async (userId: number) => {
+  const userExists = await User.doesUserExist(userId);
+  if (!userExists) {
+    const error = new Error('User not found');
+    (error as any).statusCode = 404;
+    (error as any).description = 'User not found';
+    throw error;
+  }
+  const result = await User.findOne({ userId }).select('orders');
+  return result;
+};
 export const UserServices = {
   createUserIntoDb,
   getUsersFromDb,
@@ -69,4 +78,5 @@ export const UserServices = {
   deleteSingleUserFromDb,
   updateUserToDb,
   addOrderToUserToDb,
+  getOrdersOfUserFromDb,
 };
